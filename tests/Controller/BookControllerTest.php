@@ -34,33 +34,29 @@ final class BookControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->path);
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Book index');
+        self::assertPageTitleContains('Lista de Livros');
 
-        // Use the $crawler to perform additional assertions e.g.
-        // self::assertSame('Some text on the page', $crawler->filter('.p')->first());
     }
 
     public function testNew(): void
     {
-        $this->markTestIncomplete();
         $this->client->request('GET', sprintf('%snew', $this->path));
 
         self::assertResponseStatusCodeSame(200);
 
-        $this->client->submitForm('Save', [
+        $this->client->submitForm('Salvar', [
             'book[title]' => 'Testing',
         ]);
 
-        self::assertResponseRedirects($this->path);
+        self::assertResponseRedirects('/book');
 
         self::assertSame(1, $this->repository->count([]));
     }
 
     public function testShow(): void
     {
-        $this->markTestIncomplete();
         $fixture = new Book();
-        $fixture->setTitle('My Title');
+        $fixture->setTitle('Title');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -68,14 +64,11 @@ final class BookControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Book');
-
-        // Use assertions to check that the properties are properly displayed.
+        self::assertPageTitleContains('Title');
     }
 
     public function testEdit(): void
     {
-        $this->markTestIncomplete();
         $fixture = new Book();
         $fixture->setTitle('Value');
 
@@ -84,11 +77,11 @@ final class BookControllerTest extends WebTestCase
 
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
-        $this->client->submitForm('Update', [
+        $this->client->submitForm('Editar', [
             'book[title]' => 'Something New',
         ]);
 
-        self::assertResponseRedirects('/book/');
+        self::assertResponseRedirects('/book');
 
         $fixture = $this->repository->findAll();
 
@@ -97,7 +90,6 @@ final class BookControllerTest extends WebTestCase
 
     public function testRemove(): void
     {
-        $this->markTestIncomplete();
         $fixture = new Book();
         $fixture->setTitle('Value');
 
@@ -107,7 +99,7 @@ final class BookControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
         $this->client->submitForm('Delete');
 
-        self::assertResponseRedirects('/book/');
+        self::assertResponseRedirects('/book');
         self::assertSame(0, $this->repository->count([]));
     }
 }

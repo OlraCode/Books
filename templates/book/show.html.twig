@@ -1,10 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Book{% endblock %}
+{% block title %}{{ book.title }}{% endblock %}
 
 {% block body %}
-
-    <h1>{{ book.title }}</h1>
 
     <div class="d-flex">
         <a href="{{ path('app_book_edit', {'id': book.id}) }}" class="btn btn-warning me-2">Editar</a>
