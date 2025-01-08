@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Cadastrar{% endblock %}
+
+{% block body %}
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+    {% endfor %}
+
+    {{ form_errors(registrationForm) }}
+
+    {{ form_start(registrationForm) }}
+        {{ form_row(registrationForm.email) }}
+        {{ form_row(registrationForm.plainPassword, {
+            label: 'Senha'
+        }) }}
+        {{ form_row(registrationForm.agreeTerms) }}
+
+        <button type="submit" class="btn btn-success">Register</button>
+        <a href="{{ path('app_book_index') }}" class="btn btn-secondary ms-1">Voltar</a>
+    {{ form_end(registrationForm) }}
+{% endblock %}
