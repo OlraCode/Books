@@ -19,10 +19,15 @@
             <a class="navbar-brand fs-3 fw-bold" href="{{ path('app_book_index') }}">
             Books
             </a>
-            <div class="">
-                <a href="{{ path('app_login') }}" class="me-2 btn btn-dark">Entrar</a>
-                <a href="{{ path('app_register') }}" class="btn btn-primary">Cadastrar</a>
-            </div>
+
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_logout') }}" class="btn btn-danger px-4">Sair</a>
+            {% else %}
+                <div class="">
+                    <a href="{{ path('app_login') }}" class="me-2 btn btn-dark">Entrar</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary">Cadastrar</a>
+                </div>
+            {% endif %}
         </div>
         </nav>
 

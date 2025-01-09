@@ -80,4 +80,31 @@ class RegistrationController extends AbstractController
 
         return $this->redirectToRoute('app_book_index');
     }
+
+    #[Route('/user/seed')]
+    public function createExampleUsers(UserPasswordHasherInterface $hash, EntityManagerInterface $entityManager): Response
+    {
+        $user = new User;
+        $user->setEmail('user@example.com');
+        $user->setPassword('user1234');
+        $user->setVerified(true);
+
+        $passwordHash = $hash->hashPassword($user, $user->getPassword());
+        $user->setPassword($passwordHash);
+
+        $admin = new User;
+        $admin->setEmail('admin@example.com');
+        $admin->setPassword('admin1234');
+        $admin->setVerified(true);
+        $admin->setRoles(['ROLE_ADMIN']);
+
+        $passwordHash = $hash->hashPassword($admin, $admin->getPassword());
+        $admin->setPassword($passwordHash);
+
+        $entityManager->persist($user);
+        $entityManager->persist($admin);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_book_index');
+    }
 }
