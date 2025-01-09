@@ -8,13 +8,24 @@
     <a href="{{ path('app_book_new') }}" class="btn btn-primary my-3">Adicionar Livro</a>
 {% endif %}
 
+{% if is_granted('ROLE_USER_NOT_VERIFY') %}
+
+    <div class="alert alert-warning">
+        Enviamos um link de confirmação para seu email. Por favor ative sua conta para continuar utilizando este site.
+        <a href="{{ path('app_send_verify_email') }}" class="ms-2">Reenviar email</a>
+    </div>
+
+{% endif %}
+
 <div class="mt-3 d-flex">
     <ul class="d-flex justify-content-around flex-wrap" style="width: 100%">
         {% for book in books %}
-            <li class="d-flex flex-column justify-content-between align-items-center border p-3 m-3" style="width: 250px; height: 400px">
+            <li class="d-flex flex-column justify-content-between align-items-center border p-3 m-3" style="width: 250px; {{ is_granted('ROLE_USER') ? 'height:400px' : 'height:330px' }}">
                     <h3 class="mb-auto text-center">{{ book.title }}</h3>
                     <img src="{{ asset('upload/coverImages/' ~ book.coverPath) }}" alt="Capa" style="max-height: 220px" class="img-thumbnail">
-                    <a href="{{ path('app_book_show', {id: book.id}) }}" class="btn btn-secondary mt-4">Mais detalhes</a>
+                    {% if is_granted('ROLE_USER') %}
+                        <a href="{{ path('app_book_show', {id: book.id}) }}" class="btn btn-secondary mt-4">Mais detalhes</a>
+                    {% endif %}
             </li>
         {% endfor %}
     </ul>

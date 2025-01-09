@@ -20,7 +20,7 @@
             Books
             </a>
 
-            {% if is_granted('ROLE_USER') %}
+            {% if is_granted('ROLE_USER') or is_granted('ROLE_USER_NOT_VERIFY') %}
                 <a href="{{ path('app_logout') }}" class="btn btn-danger px-4">Sair</a>
             {% else %}
                 <div class="">

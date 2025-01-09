@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
@@ -59,11 +60,27 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/verify/email', name: 'app_verify_email')]
+    #[Route('/verify/email/send', name: 'app_send_verify_email', methods: ['GET'])]
+    #[IsGranted('ROLE_USER_NOT_VERIFY')]
+    public function sendVerifyEmail(): Response
+    {
+        /** @var User */
+        $user = $this->getUser();
+
+        $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+        (new TemplatedEmail())
+            ->from(new Address('appbooks@example.com', 'App Books'))
+            ->to((string) $user->getEmail())
+            ->subject('Por Favor confirme seu Email')
+            ->htmlTemplate('registration/confirmation_email.html.twig')
+        );
+
+        return $this->redirectToRoute('app_book_index');
+    }
+
+    #[Route('/verify/email', name: 'app_verify_email', methods: ['GET'])]
     public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
     {
-        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         // validate email confirmation link, sets User::isVerified=true and persists
         try {
             /** @var User $user */
