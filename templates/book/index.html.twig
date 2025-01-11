@@ -5,7 +5,7 @@
 {% block body %}
 
 {% if is_granted('ROLE_ADMIN') %}
-    <a href="{{ path('app_book_new') }}" class="btn btn-primary my-3">Adicionar Livro</a>
+    <a href="{{ path('app_book_new') }}" class="btn btn-primary my-3" id="add-book">Adicionar Livro</a>
 {% endif %}
 
 {% if is_granted('ROLE_USER_NOT_VERIFY') %}

@@ -3,11 +3,14 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Book;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class BookControllerTest extends WebTestCase
 {
@@ -25,6 +28,42 @@ final class BookControllerTest extends WebTestCase
         foreach ($this->repository->findAll() as $object) {
             $this->manager->remove($object);
         }
+        foreach ($this->manager->getRepository(User::class)->findAll() as $object) {
+            $this->manager->remove($object);
+        }
+
+        $this->manager->flush();
+
+        $hash = $this->getContainer()->get(UserPasswordHasherInterface::class);
+
+        $unverify = new User;
+        $unverify->setEmail('unverify@example.com');
+        $unverify->setPassword('unverify1234');
+        $unverify->setVerified(false);
+
+        $passwordHash = $hash->hashPassword($unverify, $unverify->getPassword());
+        $unverify->setPassword($passwordHash);
+
+        $user = new User;
+        $user->setEmail('user@example.com');
+        $user->setPassword('user1234');
+        $user->setVerified(true);
+
+        $passwordHash = $hash->hashPassword($user, $user->getPassword());
+        $user->setPassword($passwordHash);
+
+        $admin = new User;
+        $admin->setEmail('admin@example.com');
+        $admin->setPassword('admin1234');
+        $admin->setVerified(true);
+        $admin->setRoles(['ROLE_ADMIN']);
+
+        $passwordHash = $hash->hashPassword($admin, $admin->getPassword());
+        $admin->setPassword($passwordHash);
+
+        $this->manager->persist($unverify);
+        $this->manager->persist($user);
+        $this->manager->persist($admin);
 
         $this->manager->flush();
     }
@@ -36,11 +75,31 @@ final class BookControllerTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(200);
         self::assertPageTitleContains('Lista de Livros');
+    }
 
+    public function testOnlyAdminCanAddBooks(): void
+    {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneByEmail('user@example.com');
+        $this->client->loginUser($user);
+
+        $this->client->followRedirects();
+        $crawler = $this->client->request('GET', $this->path);
+
+        $element = $crawler->filter('#add-book');
+
+        self::assertCount(0, $element);
+
+        $this->client->request('GET', sprintf('%snew', $this->path));
+        self::assertResponseStatusCodeSame(403);
     }
 
     public function testNew(): void
     {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $admin = $userRepository->findOneByEmail('admin@example.com');
+        $this->client->loginUser($admin);
+
         $this->client->request('GET', sprintf('%snew', $this->path));
 
         self::assertResponseStatusCodeSame(200);
@@ -56,6 +115,10 @@ final class BookControllerTest extends WebTestCase
 
     public function testNewWithCover(): void
     {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $admin = $userRepository->findOneByEmail('admin@example.com');
+        $this->client->loginUser($admin);
+
         $this->client->request('GET', sprintf('%snew', $this->path));
 
         $this->client->submitForm('Salvar', [
@@ -75,6 +138,10 @@ final class BookControllerTest extends WebTestCase
 
     public function testShow(): void
     {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneByEmail('user@example.com');
+        $this->client->loginUser($user);
+
         $fixture = new Book();
         $fixture->setTitle('Title');
 
@@ -89,6 +156,10 @@ final class BookControllerTest extends WebTestCase
 
     public function testEdit(): void
     {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $admin = $userRepository->findOneByEmail('admin@example.com');
+        $this->client->loginUser($admin);
+
         $fixture = new Book();
         $fixture->setTitle('Value');
 
@@ -110,6 +181,10 @@ final class BookControllerTest extends WebTestCase
 
     public function testRemove(): void
     {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $admin = $userRepository->findOneByEmail('admin@example.com');
+        $this->client->loginUser($admin);
+
         $fixture = new Book();
         $fixture->setTitle('Value');
 
