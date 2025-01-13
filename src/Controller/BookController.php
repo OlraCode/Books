@@ -30,7 +30,7 @@ final class BookController extends AbstractController
 
     #[Route('/new', name: 'app_book_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, ParameterBagInterface $parameter): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, BookRepository $repository): Response
     {
         $book = new Book();
         $form = $this->createForm(BookType::class, $book);
@@ -39,17 +39,12 @@ final class BookController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($book);
 
-            /** @var UploadedFile */
             $coverImage = $form->get('cover')->getData();
 
             if ($coverImage) {
-                $originalFileName = pathinfo($coverImage->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFileName = $slugger->slug($originalFileName);
-                $newFileName = $safeFileName . '-' . uniqid() . '.' . $coverImage->guessExtension();
-
-                $coverImage->move($parameter->get('app.cover_image_directory'), $newFileName);
-                $book->setCoverPath($newFileName);
+                $repository->addCover($book, $coverImage);
             }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
@@ -70,12 +65,19 @@ final class BookController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function edit(Request $request, Book $book, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Book $book, EntityManagerInterface $entityManager, BookRepository $repository): Response
     {
         $form = $this->createForm(BookType::class, $book);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $coverImage = $form->get('cover')->getData();
+            
+            if ($coverImage) {
+                $repository->addCover($book, $coverImage);
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);

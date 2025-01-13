@@ -165,6 +165,32 @@ final class BookControllerTest extends WebTestCase
         self::assertSame('Something New', $fixture[0]->getTitle());
     }
 
+    public function testEditWithCover(): void
+    {
+        $book = new Book();
+        $book->setTitle('Value');
+
+        $this->manager->persist($book);
+        $this->manager->flush();
+
+        $this->client->request('GET', sprintf('%s%s/edit', $this->path, $book->getId()));
+
+        $this->client->submitForm('Editar', [
+            'book[title]' => 'Something New',
+            'book[cover]' => __DIR__ . '/teste.jpg',
+        ]);
+
+        self::assertResponseRedirects('/book');
+
+        $book = $this->repository->findAll()[0];
+
+        self::assertSame('Something New', $book->getTitle());
+
+        self::assertNotNull($book->getCoverPath());
+
+        self::assertFileExists(__DIR__ . '/uploadTest');
+    }
+
     public function testRemove(): void
     {
         $fixture = new Book();
