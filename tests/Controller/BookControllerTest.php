@@ -66,6 +66,8 @@ final class BookControllerTest extends WebTestCase
         $this->manager->persist($admin);
 
         $this->manager->flush();
+
+        $this->client->loginUser($admin);
     }
 
     public function testIndex(): void
@@ -96,10 +98,6 @@ final class BookControllerTest extends WebTestCase
 
     public function testNew(): void
     {
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $admin = $userRepository->findOneByEmail('admin@example.com');
-        $this->client->loginUser($admin);
-
         $this->client->request('GET', sprintf('%snew', $this->path));
 
         self::assertResponseStatusCodeSame(200);
@@ -115,10 +113,6 @@ final class BookControllerTest extends WebTestCase
 
     public function testNewWithCover(): void
     {
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $admin = $userRepository->findOneByEmail('admin@example.com');
-        $this->client->loginUser($admin);
-
         $this->client->request('GET', sprintf('%snew', $this->path));
 
         $this->client->submitForm('Salvar', [
@@ -138,10 +132,6 @@ final class BookControllerTest extends WebTestCase
 
     public function testShow(): void
     {
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $user = $userRepository->findOneByEmail('user@example.com');
-        $this->client->loginUser($user);
-
         $fixture = new Book();
         $fixture->setTitle('Title');
 
@@ -156,10 +146,6 @@ final class BookControllerTest extends WebTestCase
 
     public function testEdit(): void
     {
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $admin = $userRepository->findOneByEmail('admin@example.com');
-        $this->client->loginUser($admin);
-
         $fixture = new Book();
         $fixture->setTitle('Value');
 
@@ -181,10 +167,6 @@ final class BookControllerTest extends WebTestCase
 
     public function testRemove(): void
     {
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $admin = $userRepository->findOneByEmail('admin@example.com');
-        $this->client->loginUser($admin);
-
         $fixture = new Book();
         $fixture->setTitle('Value');
 
