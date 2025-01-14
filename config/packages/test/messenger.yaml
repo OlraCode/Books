@@ -1,4 +1,6 @@
 framework:
     messenger:
         transports:
-            async: 'in-memory://'
+            in_memory: 'in-memory://'
+        routing:
+            'App\Message\DeleteBookMessage': in_memory

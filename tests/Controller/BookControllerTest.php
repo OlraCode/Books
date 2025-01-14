@@ -117,7 +117,7 @@ final class BookControllerTest extends WebTestCase
 
         $this->client->submitForm('Salvar', [
             'book[title]' => 'TestWithCover',
-            'book[cover]' => __DIR__ . '/teste.jpg'
+            'book[cover]' => __DIR__ . '/test.jpg'
         ]);
 
         /** @var Book */
@@ -177,7 +177,7 @@ final class BookControllerTest extends WebTestCase
 
         $this->client->submitForm('Editar', [
             'book[title]' => 'Something New',
-            'book[cover]' => __DIR__ . '/teste.jpg',
+            'book[cover]' => __DIR__ . '/test.jpg',
         ]);
 
         self::assertResponseRedirects('/book');
