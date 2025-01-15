@@ -45,6 +45,7 @@ final class BookController extends AbstractController
 
             $entityManager->flush();
 
+            $this->addFlash('success', "Livro '{$book->getTitle()}' adicionado com sucesso");
             return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -78,6 +79,7 @@ final class BookController extends AbstractController
 
             $entityManager->flush();
 
+            $this->addFlash('success', "Livro '{$book->getTitle()}' editado com sucesso");
             return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -96,8 +98,9 @@ final class BookController extends AbstractController
             $entityManager->flush();
         }
 
-        $message->dispatch(new DeleteBookMessage($book));
+        $message->dispatch(new DeleteBookMessage($book));   
 
+        $this->addFlash('success', "Livro '{$book->getTitle()}' removido com sucesso");
         return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
     }
 }
