@@ -19,6 +19,9 @@ class Book
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverPath = null;
 
+    #[ORM\Column]
+    private ?int $priceInCents = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -46,5 +49,27 @@ class Book
         $this->coverPath = $coverPath;
 
         return $this;
+    }
+
+    public function getPriceInCents(): ?int
+    {
+        return $this->priceInCents;
+    }
+
+    public function setPriceInCents(int $priceInCents): static
+    {
+        $this->priceInCents = $priceInCents;
+
+        return $this;
+    }
+
+    public function getFormatPrice(): string
+    {
+        return 'R$' . number_format($this->getPriceInCents() / 100, 2, ',', '.');
+    }
+
+    public function getPriceInReals(): float
+    {
+        return $this->getPriceInCents() / 100;
     }
 }

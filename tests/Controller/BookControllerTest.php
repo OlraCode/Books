@@ -104,11 +104,16 @@ final class BookControllerTest extends WebTestCase
 
         $this->client->submitForm('Salvar', [
             'book[title]' => 'Testing',
+            'book[price]' => '10,99',
         ]);
 
         self::assertResponseRedirects('/book');
-
         self::assertSame(1, $this->repository->count([]));
+
+        $book = $this->repository->findAll()[0];
+
+        self::assertSame('Testing', $book->getTitle());
+        self::assertSame(1099, $book->getPriceInCents());
     }
 
     public function testNewWithCover(): void
@@ -117,6 +122,7 @@ final class BookControllerTest extends WebTestCase
 
         $this->client->submitForm('Salvar', [
             'book[title]' => 'TestWithCover',
+            'book[price]' => '10',
             'book[cover]' => __DIR__ . '/test.jpg'
         ]);
 
@@ -134,6 +140,7 @@ final class BookControllerTest extends WebTestCase
     {
         $fixture = new Book();
         $fixture->setTitle('Title');
+        $fixture->setPriceInCents(1000);
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -148,6 +155,7 @@ final class BookControllerTest extends WebTestCase
     {
         $fixture = new Book();
         $fixture->setTitle('Value');
+        $fixture->setPriceInCents(1000);
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -156,6 +164,7 @@ final class BookControllerTest extends WebTestCase
 
         $this->client->submitForm('Editar', [
             'book[title]' => 'Something New',
+            'book[price]' => '10,80',
         ]);
 
         self::assertResponseRedirects('/book');
@@ -163,12 +172,14 @@ final class BookControllerTest extends WebTestCase
         $fixture = $this->repository->findAll();
 
         self::assertSame('Something New', $fixture[0]->getTitle());
+        self::assertSame(1080, $fixture[0]->getPriceInCents());
     }
 
     public function testEditWithCover(): void
     {
         $book = new Book();
         $book->setTitle('Value');
+        $book->setPriceInCents(1000);
 
         $this->manager->persist($book);
         $this->manager->flush();
@@ -195,6 +206,7 @@ final class BookControllerTest extends WebTestCase
     {
         $fixture = new Book();
         $fixture->setTitle('Value');
+        $fixture->setPriceInCents(1000);
 
         $this->manager->persist($fixture);
         $this->manager->flush();

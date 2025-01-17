@@ -35,10 +35,15 @@ final class BookController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $price = $form->get('price')->getData();
+            $priceInCents = $price * 100;
+
+            $book->setPriceInCents($priceInCents);
+
             $entityManager->persist($book);
 
             $coverImage = $form->get('cover')->getData();
-
             if ($coverImage) {
                 $repository->addCover($book, $coverImage);
             }
@@ -67,9 +72,14 @@ final class BookController extends AbstractController
     public function edit(Request $request, Book $book, EntityManagerInterface $entityManager, BookRepository $repository): Response
     {
         $form = $this->createForm(BookType::class, $book);
+        $form->get('price')->setData($book->getPriceInReals());
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $price = $form->get('price')->getData();
+            $priceInCents = $price * 100;
+            $book->setPriceInCents($priceInCents);
 
             $coverImage = $form->get('cover')->getData();
             
