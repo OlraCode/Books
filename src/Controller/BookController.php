@@ -6,6 +6,7 @@ use App\Entity\Book;
 use App\Form\BookType;
 use App\Message\DeleteBookMessage;
 use App\Repository\BookRepository;
+use App\Services\CartService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,9 +63,10 @@ final class BookController extends AbstractController
 
     #[Route('/{id}', name: 'app_book_show', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function show(Book $book): Response
+    public function show(Book $book, CartService $cart): Response
     {
-        return $this->render('book/show.html.twig', compact('book'));
+        $isInCart = $cart->hasBook($this->getUser(), $book);
+        return $this->render('book/show.html.twig', compact('book', 'isInCart'));
     }
 
     #[Route('/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]

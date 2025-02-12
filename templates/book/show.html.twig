@@ -17,9 +17,15 @@
 
 				<a href="#" class="btn btn-success px-3">Comprar</a>
 
-				<form action="{{ path('app_cart_add', {book: book.id}) }}" method="POST">
-					<button href="{{ path('app_cart_add', {book: book.id}) }}" class="btn btn-warning mx-2">Adicionar ao carrinho</button>
-				</form>
+				{% if isInCart %}
+					<form action="{{ path('app_cart_remove_book', {book: book.id}) }}" method="POST">
+						<button class="btn btn-warning mx-2">Remover do carrinho</button>
+					</form>
+				{% else %}
+					<form action="{{ path('app_cart_add', {book: book.id}) }}" method="POST">
+						<button class="btn btn-warning mx-2">Adicionar ao carrinho</button>
+					</form>
+				{% endif %}
 
 				<a href="{{ path('app_book_index') }}" class="btn btn-secondary mx-2">Voltar</a>
 			</div>
