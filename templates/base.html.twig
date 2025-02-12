@@ -23,7 +23,10 @@
 				</a>
 
 				{% if is_granted('ROLE_USER') or is_granted('ROLE_USER_NOT_VERIFY') %}
-					<a href="{{ path('app_logout') }}" class="btn btn-danger px-4">Sair</a>
+					<div class="">
+						<a href="{{ path('app_cart') }}" class="btn btn-primary me-2"><i class="bi bi-cart"></i></a>
+						<a href="{{ path('app_logout') }}" class="btn btn-danger px-4">Sair</a>
+					</div>
 				{% else %}
 					<div class="">
 						<a href="{{ path('app_login') }}" class="me-2 btn btn-dark">Entrar</a>
