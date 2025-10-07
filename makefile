@@ -12,3 +12,5 @@ migrate:
 	docker exec app php bin/console doctrine:migrations:migrate
 serve:
 	docker exec app php -S 0.0.0.0:8000 -t public/
+test:
+	docker exec app php bin/phpunit
