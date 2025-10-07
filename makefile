@@ -14,3 +14,7 @@ serve:
 	docker exec app php -S 0.0.0.0:8000 -t public/
 test:
 	docker exec app php bin/phpunit
+messenger-start:
+	docker exec app php bin/console messenger:consume
+messenger-stop:
+	docker exec app php bin/console messenger:stop-workers
