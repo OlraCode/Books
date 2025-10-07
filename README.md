@@ -29,21 +29,35 @@ Um pequeno e-commerce de livros desenvolvido com Symfony, utilizando Docker e My
   
 - ## 2️⃣ Subir os containers com Docker
   ```
-  docker compose up -d
+  make up
   ```
   
 - ## 3️⃣ Instalar as dependências
   ```
-  docker exec -it app bash
-  composer install
+  make install
   ```
 
-- ## 4️⃣ Criar e configurar o banco de dados
+- ## 4️⃣ Configurar o banco de dados e Messenger transport
   ```
-  php bin/console doctrine:database:create
-  php bin/console doctrine:migrations:migrate
+  make db-create
+  make migrate
+  make messenger-start
   ```
-- ## 5️⃣ Rodar o servidor
+- ## 5️⃣ Executar os testes
   ```
-  php -S 0.0.0.0:8000 -t public/
+  make test
   ```
+- ## 6️⃣ Rodar o servidor
+  ```
+  make serve
+  ```
+  Após isso acesse o site em [http://localhost:8000](http://localhost:8000)
+  
+  E acesse a rota [http://localhost:8000/user/seed](http://localhost:8000/user/seed) para criar usuários de teste
+
+  ### 🧑 Usuários criados automaticamente:
+  
+  | Email               | Senha       | Papel  |
+  |--------------------|------------|--------|
+  | admin@example.com   | admin1234  | Admin  |
+  | user@example.com    | user1234   | User   |
